@@ -1,3 +1,4 @@
+
 *******
 PLAYBOOK HACKS
 *******
@@ -10,4 +11,4 @@ all this is now left to be implemented by the yaml file - PLAYBOOK file.
 Authors
 =======
 
-PLAYBOOK HACKS was created by `Shunyi Chen`_
+PLAYBOOK HACKS was created by `Shunyi Chen`
