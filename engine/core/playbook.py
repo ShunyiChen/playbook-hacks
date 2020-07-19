@@ -90,9 +90,9 @@ def generate_pythonfile(outputfile):
 
         if 'register' in handler:
             var = handler.get("register")
-            function_body = str(var)+" = engine."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
+            function_body = str(var)+" = ssh_hack."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
         else:   
-            function_body = "engine."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
+            function_body = "ssh_hack."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
 
         function_body = textwrap.indent(function_body, "".ljust(4, ' '))
         function_name += function_body
@@ -100,8 +100,8 @@ def generate_pythonfile(outputfile):
         params = ""
 
 
-    t_import_area = "import sys\nsys.path.append('../')\nimport PocVerification.engine\n\n\n"
-    t_hook_area = "def __init__(self):\n    print(\"__init__\")\n\nengine = PocVerification.engine.AutomationEngine('10.168.200.39', 'ceeadm', 'Cee@Admn!23!23')\n\n"
+    t_import_area = "import sys\nsys.path.append('../')\nimport hacks.ssh_hack.SSH_Hack\n\n\n"
+    t_hook_area = "def __init__(self):\n    print(\"__init__\")\n\nssh_hack = hacks.ssh_hack.SSH_Hack('10.22.2.2', 'ad', 'ad@Admn!23!23')\n\n"
     t_main_area = "if __name__ == '__main__':\n    print('================= Running procedure =================')\n"
     t_vars_area = ""
     t_function_area = ""
@@ -157,9 +157,9 @@ def generate_pythonfile(outputfile):
         function_name = "def "+ list(task.keys())[1]+str(serial)+"("+params[:-2]+"):\n    print(\"Running task: "+task.get("name")+"\")\n"
         if 'register' in task:
             var = task.get("register")
-            function_body = str(var)+" = engine."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
+            function_body = str(var)+" = ssh_hack."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
         else:   
-            function_body = "engine."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
+            function_body = "ssh_hack."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
         
         function_body += function_notify
 
