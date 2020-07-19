@@ -1,0 +1,33 @@
+- name: ABC Health Check
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Open SSH connection
+      open_ssh:
+      
+    - name: sudo su
+      open_pod:
+    
+    - name: cd ~/5gc_sa_pkg/ssh_key
+      exec_pod_cmd:
+        cmd: cd ~/5gc_sa_pkg/ssh_key
+
+    - name: ssh -i 5g_lab_key eccd@10.10.12.60
+      exec_pod_cmd:
+        cmd: ssh -i 5g_lab_key eccd@10.10.12.60
+
+    - name: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+      exec_pod_cmd:
+        cmd: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+    
+    - name: health_check.pl -l
+      exec_pod_cmd:
+        cmd: health_check.pl -l
+        
+    - name: exit (closing pod)
+      close_pod:
+
+    - name: exit (closing ssh)
+      close_ssh:
+      
