@@ -10,9 +10,15 @@ all this is now left to be implemented by the yaml file - PLAYBOOK file.
 
 Running playbook
 =======
-cd /playbook-hacks/engine/core  
+<pre>
+    <code>
+    cd /playbook-hacks/engine/core  
+    python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py 
+ </code>
+</pre>
 
-python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py  
+![Display result]
+
 
 Authors
 =======
