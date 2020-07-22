@@ -1,0 +1,46 @@
+- name: AMF Health Check
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Open SSH connection
+      open_ssh:
+        host: 10.168.200.247
+        usr: root
+        passwd: Ericss0n
+      timeout: timeout_quit
+    - name: Open Pod
+      open_pod:
+      timeout: timeout_quit
+
+    - name: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+      exec_pod_cmd:
+        cmd: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+    
+    - name: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+      exec_pod_cmd:
+        cmd: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+     
+    - name: health_check.pl -l
+      exec_pod_cmd:
+        cmd: health_check.pl -l
+  
+    - name: health_check.pl -c 20200722-161701
+      exec_pod_cmd:
+        cmd: health_check.pl -c 20200722-161701
+      register: res
+
+    - name: Output res
+      debug:
+        msg: res
+
+    - name: health_check.pl -l
+      exec_pod_cmd:
+        cmd: health_check.pl -l
+        
+    - name: exit (closing pod)
+      close_pod:
+
+    - name: exit (closing ssh)
+      close_ssh:
+ 

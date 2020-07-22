@@ -1,4 +1,4 @@
-import sys, getopt, yaml, textwrap, os
+import sys, getopt, yaml, textwrap, os, subprocess
 
 def main(argv):
     inputfile = ''
@@ -20,21 +20,21 @@ def main(argv):
     if inputfile == '' or outputfile == '' :
         print("usage: playbook.py -i <inputfile> -o <outputfile>")
     else:
+        print('================= PARAMETERS =================')
         print('The input file is '+inputfile)
         print('The output file is '+outputfile)
         parse_playbook(inputfile)
         generate_pythonfile(outputfile)
     
-
 def parse_playbook(inputfile):
     with open(inputfile) as f:
         global x
         x = yaml.safe_load(f)
-        print('%-50s' % 'Parsing playbook file ... ', '[OK]')
+        print('%-50s' % 'Parsing playbook ... ', '[OK]')
 
 def generate_pythonfile(outputfile):
     code=""
-
+    timeout = 30 # second
     # sys.path.append('../')
     # import PocVerification.engine
     name = x[0]
@@ -43,11 +43,12 @@ def generate_pythonfile(outputfile):
 
     h_vars_area = ""
     h_function_area = ""
-    h_call_area = ""
+    # h_call_area = ""
     handlers = name.get("handlers")
     if handlers is None:
         handlers = {}
     for handler in handlers:
+        serial = serial + 1
         if 'register' in handler:
             var = handler.get("register")
             if str(var) in h_vars_area:
@@ -74,35 +75,46 @@ def generate_pythonfile(outputfile):
             else:
                 param_values += str(param_value)+", "
 
-        function_when = ''
-        if handler.get("when") is not None:
-            function_when = "if "+ handler.get("when")+":\n"
-            h_call_area += "".ljust(4, ' ')+function_when+"".ljust(8, ' ')+list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
-        else:
-            h_call_area += "".ljust(4, ' ')+list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
+        decorator_timeout = ''
+        if 'timeout' in handler:
+            if handler.get("timeout") is not None:
+                msg = ''
+                if str(handler.get("timeout")) == 'timeout_continue':
+                    msg = 'Skip '+list(handler.keys())[1]+' and continue running'
+                else:
+                    msg = 'Quit from '+list(handler.keys())[1]
+                decorator_timeout = '@set_timeout('+str(timeout)+', \''+msg+'\', '+handler.get("timeout")+')\n'
+            else: 
+                decorator_timeout = ''
 
         function_comments = "# "+handler.get("name")
-        function_name = "def "+ list(handler.keys())[1]+str(serial)+"("+params[:-2]+"):\n    print(\"Running handler: "+handler.get("name")+"\")\n"
-
-        
-        handler_func[handler.get("name")] = list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
-        # print(handler_func.get(handler.get("name"))+"---------------------")
-
+        function_name = "def "+ list(handler.keys())[1]+str(serial)+"("+params[:-2]+"):\n    print('%-50s' % 'NOTIFIED: ["+handler.get("name")+"]', '[OK]')\n"
+     
+        function_when = ''
+        if 'when' in handler:
+            if handler.get("when") is not None:
+                function_when = "if "+ handler.get("when")+":\n"
+                handler_func[handler.get("name")] = function_when+"".ljust(4, ' ')+list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
+            else:
+                handler_func[handler.get("name")] = list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
+        else:
+            handler_func[handler.get("name")] = list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
+ 
         if 'register' in handler:
             var = handler.get("register")
-            function_body = str(var)+" = ssh_hack."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
+            function_body = "global "+str(var)+"\n"+str(var)+" = engine."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
         else:   
-            function_body = "ssh_hack."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
+            function_body = "engine."+list(handler.keys())[1]+"("+params[0:-2:1]+")"
 
         function_body = textwrap.indent(function_body, "".ljust(4, ' '))
         function_name += function_body
-        h_function_area += function_comments+"\n"+str(function_name)+"" +"\n\n"
+        h_function_area += function_comments+"\n"+decorator_timeout+""+str(function_name)+"" +"\n\n"
         params = ""
 
 
-    t_import_area = "import sys\nsys.path.append('../')\nimport hacks.ssh_hack.SSH_Hack\n\n\n"
-    t_hook_area = "def __init__(self):\n    print(\"__init__\")\n\nssh_hack = hacks.ssh_hack.SSH_Hack('10.22.2.2', 'ad', 'ad@Admn!23!23')\n\n"
-    t_main_area = "if __name__ == '__main__':\n    print('================= Running procedure =================')\n"
+    t_import_area = "import sys\nfrom timeout_handle import set_timeout, timeout_quit, timeout_continue\nsys.path.append('../')\nimport hacks.facade\n\n\n"
+    t_hook_area = "def __init__(self):\n    print(\"__init__\")\n\nengine = hacks.facade.Facade()\n\n"
+    t_main_area = "if __name__ == '__main__':\n    print('')\n"
     t_vars_area = ""
     t_function_area = ""
     t_call_area = ""
@@ -134,44 +146,61 @@ def generate_pythonfile(outputfile):
 
         for param_value in args_values:
             if type(param_value) is str:
-                param_values += "\'"+param_value+"\', "
+                if param_value in t_vars_area:
+                   param_values += ""+param_value+", "
+                else:
+                    param_values += "\'"+param_value+"\', "
             else:
                 param_values += str(param_value)+", "
 
+        decorator_timeout = ''
+        if 'timeout' in task:
+            if task.get("timeout") is not None:
+                msg = ''
+                if str(task.get("timeout")) == 'timeout_continue':
+                    msg = 'Skip '+list(task.keys())[1]+' and continue running'
+                else:
+                    msg = 'Quit from '+list(task.keys())[1]
+                decorator_timeout = '@set_timeout('+str(timeout)+', \''+msg+'\', '+task.get("timeout")+')\n'
+            else: 
+                decorator_timeout = ''
+
         function_when = ''
-        if task.get("when") is not None:
-            function_when = "if "+ task.get("when")+":\n"
-            t_call_area += "".ljust(4, ' ')+function_when+"".ljust(8, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
+        if 'when' in task:
+            if task.get("when") is not None:
+                function_when = "if "+ task.get("when")+":\n"
+                t_call_area += "".ljust(4, ' ')+function_when+"".ljust(8, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
+            else:
+                t_call_area += "".ljust(4, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
         else:
             t_call_area += "".ljust(4, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
 
         function_notify = ''
-        if task.get("notify") is not None:
-            notify_list = task.get("notify")
-            for call_method in notify_list:
-                function_notify += handler_func.get(call_method)+"\n"
-        else:
-            function_notify += ''
+        if 'notify' in task:
+            if task.get("notify") is not None:
+                notify_list = task.get("notify")
+                for call_method in notify_list:
+                    if call_method in handler_func:
+                        function_notify += handler_func.get(call_method)+"\n"
+            else:
+                function_notify += ''
              
         function_comments = "# "+task.get("name")
-        function_name = "def "+ list(task.keys())[1]+str(serial)+"("+params[:-2]+"):\n    print(\"Running task: "+task.get("name")+"\")\n"
+        function_name = "def "+ list(task.keys())[1]+str(serial)+"("+params[:-2]+"):\n    print('%-50s' % 'TASK: ["+task.get("name")+"]', '[OK]')\n"
+        
         if 'register' in task:
             var = task.get("register")
-            function_body = str(var)+" = ssh_hack."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
+            function_body = "global "+str(var)+"\n"+str(var)+" = engine."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
         else:   
-            function_body = "ssh_hack."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
+            function_body = "engine."+list(task.keys())[1]+"("+params[0:-2:1]+")\n"
         
         function_body += function_notify
 
-  
         function_body = textwrap.indent(function_body, "".ljust(4, ' '))
         function_name += function_body
-        t_function_area += function_comments+"\n"+str(function_name)+"" +"\n\n"
+        t_function_area += function_comments+"\n"+decorator_timeout+""+str(function_name)+"" +"\n\n"
         params = ""
  
-    t_call_area += "    print('%-50s' % 'Run Success!', '[OK]')\n\n"
-    
-    t_main_area += h_call_area
     t_main_area += t_call_area
     code += t_import_area
     code += h_vars_area
@@ -182,14 +211,13 @@ def generate_pythonfile(outputfile):
     code += t_main_area
     # t_main_area = textwrap.indent(t_main_area, "".ljust(4, ' '))
     # t_main_area = t_main_area[4:]
-    
+    # Create new file
     py_create(code, outputfile)
     
-    # print(t_main_area)
-    print('%-50s' % 'Creating python file ... ', '[OK]')
-    os.system("python3 temp.py")
-
-
+    print('%-50s' % 'Generating python ... ', '[OK]')
+    # os.system("python3 temp.py")
+    # ret = subprocess.getoutput('python3 temp.py')
+    subprocess.run(['python3', 'temp.py']) # official recommendation
 
 def py_create(code, output):
     f= open(output,"w+")

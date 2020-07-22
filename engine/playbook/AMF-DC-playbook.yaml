@@ -1,0 +1,53 @@
+- name: AMF Data Collection
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Open SSH connection
+      open_ssh:
+        host: 10.168.200.247
+        usr: root
+        passwd: Ericss0n
+      timeout: timeout_quit
+    - name: Open Pod
+      open_pod:
+      timeout: timeout_quit
+
+    - name: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+      exec_pod_cmd:
+        cmd: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+    
+    - name: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+      exec_pod_cmd:
+        cmd: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
+     
+    - name: gsh get_ne
+      exec_pod_cmd:
+        cmd: gsh get_ne
+  
+    - name: ndump
+      exec_pod_cmd:
+        cmd: ndump
+
+    - name: cd /tmp/DPE_COMMONLOG/NodeDump/
+      exec_pod_cmd:
+        cmd: cd /tmp/DPE_COMMONLOG/NodeDump/
+        
+    - name: ls -l
+      exec_pod_cmd:
+        cmd: ls -l
+
+    - name: gsh list_alarms
+      exec_pod_cmd:
+        cmd: gsh list_alarms
+
+    - name: gsh show_fm_alarm
+      exec_pod_cmd:
+        cmd: gsh show_fm_alarm
+    
+    - name: exit (closing pod)
+      close_pod:
+
+    - name: exit (closing ssh)
+      close_ssh:
+ 

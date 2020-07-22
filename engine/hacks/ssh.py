@@ -4,7 +4,8 @@ import socket
 import time
 import paramiko
 
-class SSH_Hack(object):
+class SSH(object):
+
     def __init__(self, host, username, password=None, key=None):
         self.host = host
         self.username = username
@@ -23,11 +24,11 @@ class SSH_Hack(object):
         self.pod_out = None
         self.pod_err = None
 
-    def open_ssh(self):
+    def open_ssh(self, host, usr, passwd):
         self.ssh = paramiko.SSHClient()
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy)
         try:
-            self.ssh.connect(self.host, username=self.username, password=self.password, pkey=self.key)
+            self.ssh.connect(host, username=usr, password=passwd, pkey=self.key)
         except socket.error:
             print('SSH connection failed.')
         return self.ssh
@@ -56,8 +57,8 @@ class SSH_Hack(object):
         time.sleep(0.5)
         time_count = 0
         while not self.pod_out.channel.recv_ready():
-            time.sleep(0.1)
-            time_count = time_count + 0.1
+            time.sleep(0.01)
+            time_count = time_count + 0.01
             if time_count > timeout:
                 break
 
@@ -88,9 +89,9 @@ class SSH_Hack(object):
     def close_sftp(self):
         self.sftp.close()
 
-
 if __name__ == '__main__':
-    ssh_hack = SSH_Hack('tyserccd901', 'eccd', key='/home/omts/jenkins/ssh_key/forDirector/id_rsa')
-    ssh_hack.ssh()
-    print(ssh_hack.exec_cmd("pwd"))
-    ssh_hack.close_ssh()
+    pass
+    # ssh = SSH('tyserccd901', 'eccd', key='/home/omts/jenkins/ssh_key/forDirector/id_rsa')
+    # ssh.open_ssh()
+    # print(ssh.exec_cmd("pwd"))
+    # ssh.close_ssh()

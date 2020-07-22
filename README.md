@@ -8,6 +8,12 @@ system easiter to do Data Collection(CPU,Memory,HC reports,etc) or Health Check 
 Avoid writing scripts or custom code to update your applications, And then 
 all this is now left to be implemented by the yaml file - PLAYBOOK file.
 
+Running playbook
+=======
+cd /playbook-hacks/engine/core  
+
+python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py  
+
 Authors
 =======
 
