@@ -11,14 +11,20 @@ all this is now left to be implemented by the yaml file - PLAYBOOK file.
 Running playbook
 =======
 <pre>
-    <code>
-    cd /playbook-hacks/engine/core  
-    python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py 
- </code>
+<code>
+cd /playbook-hacks/engine/core  
+python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py 
+</code>
 </pre>
+![Image text](https://github.com/ShunyiChen/playbook-hacks/blob/master/results1.png)
 
-![Display result]
-
+<pre>
+<code>
+cd /playbook-hacks/engine/core  
+python3 playbook.py -i ../playbook/AMF-DC-playbook.yaml -o temp.py 
+</code>
+</pre>
+![Image text](https://github.com/ShunyiChen/playbook-hacks/blob/master/results2.png)
 
 Authors
 =======
