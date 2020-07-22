@@ -5,17 +5,17 @@
   tasks:
     - name: Open SSH connection
       open_ssh:
-        host: 10.168.200.247
+        host: 10.168.20.12
         usr: root
-        passwd: Ericss0n
+        passwd: 12s112n
       timeout: timeout_quit
     - name: Open Pod
       open_pod:
       timeout: timeout_quit
 
-    - name: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+    - name: ssh -i /root/.ssh/5g_lab_key eccd@10.1.172.10
       exec_pod_cmd:
-        cmd: ssh -i /root/.ssh/5g_lab_key eccd@10.221.172.60
+        cmd: ssh -i /root/.ssh/5g_lab_key eccd@10.1.172.10
     
     - name: kubectl exec -n pcc1 -ti eric-pc-mm-controller-0 -- tcsh
       exec_pod_cmd:
