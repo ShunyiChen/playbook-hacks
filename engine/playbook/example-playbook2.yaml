@@ -20,13 +20,13 @@
               cmd: ls -al /usr/shunyi/ansible-workspace/
       register: return_value
 
-    - name: yujyuj
+    - name: Checks if return value equals to \'~]# \'
       debug:
         msg: return_value
       when: return_value.endswith('~]# ')
       notify: 
-        #  - quit_procedure
          - continue_warning
+         - quit_procedure
 
     - name: ssh close
       close_ssh:

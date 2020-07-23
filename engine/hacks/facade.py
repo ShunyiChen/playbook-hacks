@@ -7,7 +7,7 @@ class Facade(object):
         pass
 
     ssh_instance = SSH('', '')
-    debug_instance = Debug('')
+    debug_instance = Debug()
 
     def open_ssh(self, host, usr, passwd):
         self.ssh_instance.open_ssh(host, usr, passwd)
