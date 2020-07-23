@@ -1,0 +1,40 @@
+# python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py
+- name: example
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Add two Numbers together
+      open_ssh:
+        host: 192.168.3.25
+        usr: root
+        passwd: cDe3@wsx
+      timeout: timeout_quit
+
+    - name: Open Pod
+      open_pod:
+      timeout: timeout_quit
+    
+    - name: ls -l /usr/shunyi --color=never
+      invoke_shell:
+              cmd: ls -al /usr/shunyi/ansible-workspace/
+      register: return_value
+
+    - name: yujyuj
+      debug:
+        msg: return_value
+      when: return_value.endswith('~]# ')
+      notify: 
+        #  - quit_procedure
+         - continue_warning
+
+    - name: ssh close
+      close_ssh:
+
+  handlers:
+    - name: quit_procedure
+      quit_procedure: 
+    
+    - name: continue_warning
+      continue_warning: 
+        msg: '跳过并继续'
