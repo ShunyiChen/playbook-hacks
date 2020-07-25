@@ -71,7 +71,10 @@ def generate_pythonfile(outputfile):
 
         for param_value in args_values:
             if type(param_value) is str:
-                param_values += "\'"+param_value+"\', "
+                if param_value in h_vars_area:
+                    param_values += ""+param_value+", "
+                else:
+                    param_values += "\'"+param_value+"\', "
             else:
                 param_values += str(param_value)+", "
 

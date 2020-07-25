@@ -53,14 +53,12 @@ class SSH(object):
         channel = self.ssh.invoke_shell()
         channel.send(cmd+'\n')
         time.sleep(3)
-        output = channel.recv(2024)
-        output = output.decode('utf8')
-        # print(output)
-        return output
-        # time.sleep(10)
-        # stdout = channel.recv(1024*100000)
-        # out_list = stdout.decode().split("\n")
-        # print(out_list)
+        resp = ''
+        while not resp.endswith(('$ ','# ')):
+            output = channel.recv(99999)
+            output = output.decode('utf8')
+            resp += output
+        return resp
  
 if __name__ == '__main__':
     pass
