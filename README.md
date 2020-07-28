@@ -11,7 +11,7 @@ all this is now left to be implemented by the yaml file, to write the PLAYBOOK.
 
 Health Check Example
 =======
-Customize a playbook and named it healthcheck-example.yaml: 
+**Customize a playbook:** 
 <pre>
 <code>  
 - name: An example of Health Check for remote server
@@ -74,15 +74,16 @@ Customize a playbook and named it healthcheck-example.yaml:
 </code>
 </pre>
 
-Running the playbook 
-=======
+**Running the playbook** 
 <pre>
 <code>
-cd /playbook-hacks/engine/core  # Go to this directory for running below command  
-python3 playbook.py -i ../playbook/healthcheck-example.yaml -o temp.py # Run the playbook, -i to specify which playbook file should use and -o to specify a python file which wish to generate.Finally to execute the generated python file.
+# Go to this directory and recognize playbook.py command
+cd /playbook-hacks/engine/core
+# Run the playbook -i to specify which playbook file should parse and -o to specify a python file which one you wish to generate.Finally, Autorun the generated python file. 
+python3 playbook.py -i ../playbook/healthcheck-example.yaml -o temp.py 
 </code>
 </pre>
-Result:  
+**Result:**   
 
 ![Image text](https://github.com/ShunyiChen/playbook-hacks/blob/master/health_check_example.png)
 
