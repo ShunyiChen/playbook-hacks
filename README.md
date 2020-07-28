@@ -11,11 +11,9 @@ all this is now left to be implemented by the yaml file - PLAYBOOK file.
 
 Health Check Example
 =======
-Custom a playbook: 
-<code>
-  
-# python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py
-  
+Customize a playbook: 
+<pre>
+<code>  
 - name: example 
   hosts: all 
   gather_facts: no 
@@ -73,8 +71,8 @@ Custom a playbook:
 
     - name: close_channel
       close_channel:
-  
 </code>
+</pre>
 
 Running the playbook 
 =======
