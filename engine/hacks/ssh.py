@@ -14,9 +14,7 @@ class SSH(object):
         if key:
             self.key = paramiko.RSAKey.from_private_key_file(key, password)
         self.ssh = None
-        self.pod_in = None
-        self.pod_out = None
-        self.pod_err = None
+        self.channel = None
 
     def open_ssh(self, host, usr, passwd):
         self.ssh = paramiko.SSHClient()
@@ -26,39 +24,32 @@ class SSH(object):
         except socket.error:
             print('SSH connection failed.')
         return self.ssh
- 
-    def close_ssh(self):
-        self.ssh.close()
-
-    def open_pod(self):
-        self.pod_in, self.pod_out, self.pod_err = self.ssh.exec_command('sudo su')
-        return self._read_pod_cmd_output()
-
-    def exec_pod_cmd(self, cmd):
-        self.pod_in.channel.send(cmd + os.linesep)
-        return self._read_pod_cmd_output()
-
-    def _read_pod_cmd_output(self):
-        time.sleep(0.5)
-        result = ""
-        while self.pod_out.channel.recv_ready():
-            result += str(self.pod_out.channel.recv(1024), encoding ="utf-8")
-        print(result)
-        return result.strip()
-
-    def close_pod(self):
-        self.pod_in.channel.send("exit" + os.linesep)
-    
-    def invoke_shell(self, cmd):
-        channel = self.ssh.invoke_shell()
-        channel.send(cmd+'\n')
-        time.sleep(3)
+  
+    def invoke_shell(self, cmd, passwd=None):
+        if self.channel is None:
+            self.channel = self.ssh.invoke_shell()
+        self.channel.send(cmd+'\n')
+        time.sleep(1)
         resp = ''
-        while not resp.endswith(('$ ','# ')):
-            output = channel.recv(99999)
-            output = output.decode('utf8')
-            resp += output
+        while self.channel.recv_ready():
+            channel_bytes = self.channel.recv(9999)
+            channel_data = channel_bytes.decode('utf8')
+            if channel_data.endswith(("~ # ", "~> ", "# ", " / # ",":/# ", "~]# ")):
+                print("---------"+channel_data)
+            elif channel_data.endswith(("? ")):
+                self.channel.send('yes'+'\n')
+            elif channel_data.endswith(("password: ")):
+                self.channel.send(passwd+'\n')
+            else:
+                print("error:xxxxxxxxxx"+channel_data)
         return resp
- 
+
+     
+    def quit_shell(self):
+        return self.invoke_shell('exit')
+
+    def close_channel(self):
+        self.channel.close()
+
 if __name__ == '__main__':
     pass

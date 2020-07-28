@@ -8,6 +8,3 @@ class Debug(object):
            print(str(msg))
         if type(msg) is str:
            print(msg)
-           
-    def add(self, x, y):
-        return x + y

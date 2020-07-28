@@ -11,31 +11,23 @@ class Facade(object):
 
     def open_ssh(self, host, usr, passwd):
         self.ssh_instance.open_ssh(host, usr, passwd)
-    
-    def close_ssh(self):
-        self.ssh_instance.close_ssh()
 
-    def open_pod(self):
-        self.ssh_instance.open_pod()
-    
-    def exec_pod_cmd(self, cmd):
-        self.ssh_instance.exec_pod_cmd(cmd)
- 
-    def close_pod(self):
-        self.ssh_instance.close_pod()
+    def invoke_shell(self, cmd, passwd=None):
+        return self.ssh_instance.invoke_shell(cmd, passwd)
 
-    def invoke_shell(self, cmd):
-        return self.ssh_instance.invoke_shell(cmd)
+    def quit_shell(self):
+        return self.ssh_instance.quit_shell()
+
+    def close_channel(self):
+        return self.ssh_instance.close_channel()
 
     def debug(self, msg):
         return self.debug_instance.debug(msg)
 
-    def add(self, x, y):
-        return self.debug_instance.add(x, y)
-
     def quit_procedure(self): # 超时后的处理函数
+        print('Exited.')
         exit(1)
-    
+        
     def continue_warning(self, msg): # 超时后的处理函数
         print(msg)
         pass

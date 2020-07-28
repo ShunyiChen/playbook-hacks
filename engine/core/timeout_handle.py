@@ -29,15 +29,6 @@ def set_timeout(num, msg, callback):
     return to_do
   return wrap
   
-# if __name__ == '__main__':
-#   def after_timeout(): # 超时后的处理函数
-#     print("do something after timeout.")
-  
-#   @set_timeout(2, after_timeout) # 限时 2 秒
-#   def connect(): # 要执行的函数
-#     time.sleep(1) # 函数执行时间，写大于2的值，可测试超时
-#     return 'connect success.'
-  
-  
-#   var = connect()
-#   print(var)
+if __name__ == '__main__':
+    pass
+ 

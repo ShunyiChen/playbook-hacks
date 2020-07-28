@@ -97,6 +97,7 @@ def generate_pythonfile(outputfile):
         if 'when' in handler:
             if handler.get("when") is not None:
                 function_when = "if "+ handler.get("when")+":\n"
+                function_when = function_when.replace('*#', '#')
                 handler_func[handler.get("name")] = function_when+"".ljust(4, ' ')+list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
             else:
                 handler_func[handler.get("name")] = list(handler.keys())[1]+str(serial)+"("+param_values[:-2]+")"
@@ -172,6 +173,7 @@ def generate_pythonfile(outputfile):
         if 'when' in task:
             if task.get("when") is not None:
                 function_when = "if "+ task.get("when")+":\n"
+                function_when = function_when.replace('*#', '#')
                 t_call_area += "".ljust(4, ' ')+function_when+"".ljust(8, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"
             else:
                 t_call_area += "".ljust(4, ' ')+list(task.keys())[1]+str(serial)+"("+param_values[:-2]+")\n"

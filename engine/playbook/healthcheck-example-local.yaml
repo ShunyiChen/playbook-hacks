@@ -1,0 +1,40 @@
+# python3 playbook.py -i ../playbook/example-playbook.yaml -o temp.py
+- name: example
+  hosts: all
+  gather_facts: no
+  become: yes
+  tasks:
+    - name: Connect over ssh
+      open_ssh:
+        host: 100.98.102.105
+        usr: root
+        passwd: cDe3@wsx
+      timeout: timeout_quit
+
+    - name: ssh -i /root/.ssh/id_rsa root@100.98.102.105
+      invoke_shell:
+        cmd: ssh -i /root/.ssh/id_rsa root@100.98.102.105
+        passwd: 'cDe3@wsx'
+      timeout: timeout_quit
+ 
+    - name: docker exec -it mysql bash
+      invoke_shell:
+        cmd: docker exec -it mysql bash
+      timeout: timeout_quit
+      register: return_value
+ 
+    - name: Check
+      quit_procedure:  
+      when:  not return_value.endswith(('=== rp-pcc-1 system_admin@eric-pc-mm-controller-0 ANCB / *# '))
+
+    - name: ls -al
+      invoke_shell:
+        cmd: ls -al
+
+    - name: quit_shell
+      quit_shell:
+
+    - name: close_channel
+      close_channel:
+
+ 
