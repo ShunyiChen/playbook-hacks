@@ -6,15 +6,15 @@ PLAYBOOK HACKS
 PLAYBOOK HACKS is a automation platform that makes your applications and
 system easiter to do Data Collection(CPU,Memory,HC reports,etc) or Health Check from remote servers.
 Avoid writing scripts or custom code to update your applications, And then 
-all this is now left to be implemented by the yaml file - PLAYBOOK file.
+all this is now left to be implemented by the yaml file, to write the PLAYBOOK.
 
 
 Health Check Example
 =======
-Customize a playbook: 
+Customize a playbook and named it healthcheck-example.yaml: 
 <pre>
 <code>  
-- name: example 
+- name: An example of Health Check for remote server
   hosts: all 
   gather_facts: no 
   become: yes 
@@ -78,8 +78,8 @@ Running the playbook
 =======
 <pre>
 <code>
-cd /playbook-hacks/engine/core  
-python3 playbook.py -i ../playbook/healthcheck-example.yaml -o temp.py 
+cd /playbook-hacks/engine/core  # Go to this directory for running below command  
+python3 playbook.py -i ../playbook/healthcheck-example.yaml -o temp.py # Run the playbook, -i to specify which playbook file should use and -o to specify a python file which wish to generate.Finally to execute the generated python file.
 </code>
 </pre>
 Result:  
